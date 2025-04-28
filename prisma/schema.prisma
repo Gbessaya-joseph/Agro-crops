@@ -1,0 +1,129 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  FOURNISSEUR
+  PRENEUR
+}
+
+enum PropositionStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  EXPIRED
+}
+
+model User {
+  id            Int      @id @default(autoincrement())
+  email         String   @unique
+  password      String   @db.VarChar(255)
+  role          Role
+  fournisseur   Fournisseur?
+  preneur       Preneur?
+  accounts      Account[]
+  sessions      Session[]
+}
+
+model Account {
+  id           Int       @id @default(autoincrement())
+  userId       Int
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  provider     String
+  providerAccountId String
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           Int       @id @default(autoincrement())
+  userId       Int
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expires      DateTime
+  sessionToken String    @unique
+}
+
+model Fournisseur {
+  idFourn      Int      @id @default(autoincrement())
+  userId       Int      @unique
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  NomFourn     String
+  PrenFourn    String
+  TelFourn     String   @unique @db.Char(8)
+  LocalFourn   String
+  RegionFourn  String
+  Produit      Produit[]
+  propositions Proposition[]
+  commandes    Commande[]
+}
+
+model Preneur {
+  idPren       Int      @id @default(autoincrement())
+  userId       Int      @unique
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  NomPren      String
+  PrenPren     String
+  TelPren      String   @unique @db.Char(8)
+  LocPren      String
+  regionPren   String
+  TyPren       String
+  propositions Proposition[]
+  commandes    Commande[]
+}
+
+model Commande {
+  NumCmde     Int      @id @default(autoincrement())
+  DateCmde    DateTime @default(now())
+  QteCmde     Int
+  StatusCmd   String
+  RefldPren   Int
+  RefldFourn  Int
+  RefldProd   Int
+  preneur     Preneur  @relation(fields: [RefldPren], references: [idPren])
+  fournisseur Fournisseur @relation(fields: [RefldFourn], references: [idFourn])
+  produit     Produit  @relation(fields: [RefldProd], references: [idProd])
+}
+
+model Produit {
+  idProd      Int      @id @default(autoincrement())
+  NomProd     String   @unique
+  ImageUrl    String?  @db.VarChar(255) // Ex: "https://res.cloudinary.com/ton-compte/image/upload/v1234567/produit1.jpg"
+  RefldCat    Int
+  categorie   Categorie @relation(fields: [RefldCat], references: [idCat])
+  RefldFourn  Int
+  propositions Proposition[]
+  commandes    Commande[]
+  fournisseur Fournisseur @relation(fields: [RefldFourn], references: [idFourn])
+  @@index([RefldCat])
+}
+
+model Categorie {
+  idCat       Int      @id @default(autoincrement())
+  NomCat      String   @unique
+  produits    Produit[]
+}
+
+model Proposition {
+  idProp      Int      @id @default(autoincrement())
+  QteProp     Int
+  DateProp    DateTime @default(now())
+  DateModifProp DateTime @updatedAt
+  StatusProp  PropositionStatus
+  PrixProp    Float
+  DateExpirProp DateTime
+  RefldFourn  Int
+  RefldPren   Int?
+  RefldProd   Int
+  fournisseur Fournisseur @relation(fields: [RefldFourn], references: [idFourn])
+  preneur     Preneur?  @relation(fields: [RefldPren], references: [idPren])
+  produit     Produit  @relation(fields: [RefldProd], references: [idProd])
+}
