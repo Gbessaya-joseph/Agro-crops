@@ -2,7 +2,7 @@ import { Gallery4, Gallery4Props } from "./gallery4";
 
 
 const demoData: Gallery4Props = {
-  title: "Projects",
+  title: "Products",
   description:
     "Discover how leading companies and developers are leveraging modern web technologies to build exceptional digital experiences. These case studies showcase real-world applications and success stories.",
   items: [
