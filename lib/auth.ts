@@ -27,6 +27,23 @@ export const authOptions: NextAuthOptions = {
     }),
     // ... autres providers (Google, Facebook)
   ],
+  pages: {
+    signIn: "/auth/signin",
+    error: "/auth/error", // Error code passed in query string as ?error=
+    verifyRequest: "/auth/verify-request", // (used for check email message)
+    newUser: undefined, // Will disable the new account creation screen
+  },
+  cookies: {
+    csrfToken: {
+      name: "next-auth.csrf-token",
+      options: {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        path: "/",
+      },
+    },
+  },
 };
 
 export default authOptions;

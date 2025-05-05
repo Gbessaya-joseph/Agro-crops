@@ -11,19 +11,12 @@ import { createUserWithPreneur } from "../data/users";
 
 export async function registerFournisseur(formData: FormData) {
     try {
-  const rawData = {
-    email: formData.get("email"),
-    password: formData.get("password"),
-    nom: formData.get("nom")?.toString(),
-    prenom: formData.get("prenom"),
-    telephone: formData.get("telephone"),
-    localisation: formData.get("localisation"),
-    region: formData.get("region"),
-    // ...
-  };
+  const rawData = Object.fromEntries(formData.entries())
 
   // Validation Zod
   const validatedData = FournisseurSchema.parse(rawData);
+  console.log("Données validées:", validatedData); // Debug
+  //l
 
   // Création en DB
   await createUserWithFournisseur(
@@ -71,7 +64,7 @@ export async function facebookSignup() {
 }
 
 // register buyer with tanstack
-export async function registerBuyer(formData: FormData) {
+export async function registerPreuneur(formData: FormData) {
   try {
     const rawData = {
       email: formData.get("email"),

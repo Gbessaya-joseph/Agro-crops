@@ -28,4 +28,7 @@ export const PreneurSchema = UserSchema.extend({
   region: z.string(),
 }).omit({ role: true }); // Role forcé à "PRENEUR"
 
-
+// export type UserSchema = z.infer<typeof UserSchema>;
+// export type FournisseurSchema = z.infer<typeof FournisseurSchema>;
+// export type PreneurSchema = z.infer<typeof PreneurSchema>;
+// export type User = UserSchema & { id: string };

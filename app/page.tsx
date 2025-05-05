@@ -3,8 +3,9 @@ import { Gallery4Demo } from "@/components/caroussel";
 import { FeatureDemo } from "@/components/feature-section";
 import { HeroBackground } from "@/components/hero_background";
 import { NavbarDemo } from "@/components/navbar";
-// import { SignupForm } from "@/components/ui/signup-form";
-// import HomePage from "./test";
+import '@fortawesome/fontawesome-svg-core/styles.css'; // Import the CSS
+import { config } from '@fortawesome/fontawesome-svg-core';
+config.autoAddCss = false; // Prevent Font Awesome from adding CSS automatically
 export default function Home() {
   return (
     // <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
