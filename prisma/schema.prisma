@@ -1,8 +1,6 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 generator client {
   provider = "prisma-client-js"
 }
@@ -25,9 +23,14 @@ enum PropositionStatus {
 }
 
 model User {
-  id            Int      @id @default(autoincrement())
-  email         String   @unique
-  password      String   @db.VarChar(255)
+  id            String     @id @default(uuid()) @map("id") @db.VarChar(36)
+  email         String     @unique
+  password      String?    @db.VarChar(255)
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  name          String?
+  avatar        String?    @db.VarChar(512)
+  avatarPublicId String?   @db.VarChar(255)
   role          Role
   fournisseur   Fournisseur?
   preneur       Preneur?
@@ -36,46 +39,43 @@ model User {
 }
 
 model Account {
-  id           Int       @id @default(autoincrement())
-  userId       Int
-  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  provider     String
+  id                Int     @id @default(autoincrement())
+  userId            String  @db.VarChar(36)
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  provider          String
   providerAccountId String
+  
   @@unique([provider, providerAccountId])
 }
 
 model Session {
   id           Int       @id @default(autoincrement())
-  userId       Int
+  userId       String    @db.VarChar(36)
   user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   expires      DateTime
   sessionToken String    @unique
 }
 
 model Fournisseur {
-  idFourn      Int      @id @default(autoincrement())
-  userId       Int      @unique
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  NomFourn     String
-  PrenFourn    String
-  TelFourn     String   @unique @db.Char(8)
+  idFourn      Int       @id @default(autoincrement())
+  userId       String    @unique @db.VarChar(36)
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name         String? 
+  TelFourn     String    @unique @db.Char(8)
   LocalFourn   String
-  RegionFourn  String
   Produit      Produit[]
   propositions Proposition[]
   commandes    Commande[]
 }
 
 model Preneur {
-  idPren       Int      @id @default(autoincrement())
-  userId       Int      @unique
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  NomPren      String
-  PrenPren     String
-  TelPren      String   @unique @db.Char(8)
-  LocPren      String
-  regionPren   String
-  TyPren       String
+  idPren       Int       @id @default(autoincrement())
+  userId       String    @unique @db.VarChar(36)
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name         String?
+  TyPren       String?
+  TelPren      String    @unique @db.Char(8)
+  LocalPren      String
   propositions Proposition[]
   commandes    Commande[]
 }
@@ -96,7 +96,8 @@ model Commande {
 model Produit {
   idProd      Int      @id @default(autoincrement())
   NomProd     String   @unique
-  ImageUrl    String?  @db.VarChar(255) // Ex: "https://res.cloudinary.com/ton-compte/image/upload/v1234567/produit1.jpg"
+  ImageUrl    String?  @db.VarChar(512)
+  publicId    String?  @db.VarChar(255)
   RefldCat    Int
   categorie   Categorie @relation(fields: [RefldCat], references: [idCat])
   RefldFourn  Int
